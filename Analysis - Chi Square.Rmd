@@ -1,0 +1,167 @@
+---
+title: "USAID - Chi Square analysis of Survey respoinses"
+author: "Arogya Koirala"
+date: "April 28, 2017"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(corrplot)
+library(reshape)
+library(tidyr)
+library(dplyr)
+```
+
+## Introduction
+
+The objective of this analysis is to understand if there is any difference in the responses of the NRA - Housing Reconstruction Assessment for the following two groups of VDCs in Dhading:
+
+* USAID Benefeciary VDCs : Darkha, Dhuwakot, Jyamrung, Kalleri, Khalte, Kumpur, Marpak, Nalang, Nilkantha, Semjong, Sertung, Tipling, Murali Bhanjyang, Sangkosh, Sunaula Bazar
+* Rest of the VDCs in Dhading
+
+### Methodology
+We are going to use a simple chi-square test to assess if there is any relation between the nature of VDC (USAID or Rest) and any of the survey responses (for eg, has construction started?, why hasn't construction started yet?, etc.)
+
+The chi-square test of independence is used to analyze the frequency table (i.e. contengency table) formed by two categorical variables. The chi-square test evaluates whether there is a significant association between the categories of the two variables. 
+
+Chi-square test examines whether rows and columns of a contingency table are statistically significantly associated.
+
+* Null hypothesis (H0): the row and the column variables of the contingency table are independent.
+* Alternative hypothesis (H1): row and column variables are dependent
+
+This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with df=(r−1)(c−1) degrees of freedom and p = 0.05.
+
+If the calculated Chi-square statistic is greater than the critical value, then we must conclude that the row and the column variables are not independent of each other. This implies that they are significantly associated.
+
+## Sample Analysis 1 : Why weren't the building codes followed?
+
+### 'Construction Completed' Households
+
+Let's perform the analysis on the question "Why weren't the building codes followed" for the households that have already completed construction. Beneficiaries can provide the following responses to the question:
+
+* Don't know (wnf_comp_dk)
+* Too expensive (wnf_comp_te)
+* Lack of trained mason (wnf_comp_ltm)
+* Don't care (wnf_comp_dc)
+* Other (wnf_comp_dk)
+
+These responses will be compared for the following two categories of VDCs: 
+
+* USAID Benefeciary VDCs
+* Rest of the VDCs in Dhading
+
+First we start by cleaning the raw data, which contains total responses across each bucket.
+
+```{r}
+df <- read.csv("data/input_table.csv")
+df <- df [-(which(df$surveyed_popn == 0)),]
+df_soc <- df[,c("wnf_comp_dk","wnf_comp_te","wnf_comp_ltm","wnf_comp_dc","wnf_comp_other", "category")]
+df_soc_long <- gather(df_soc, wnf_comp, value, wnf_comp_dk:wnf_comp_other, factor_key=TRUE)
+df_soc_long$value <- as.numeric(as.character(df_soc_long$value))
+aggdata<- df_soc_long %>% group_by(category, wnf_comp) %>% summarise(total = sum(value))
+aggData_wide <- spread(aggdata, wnf_comp, total)
+
+myData <- as.matrix(aggData_wide[,-1])
+rownames(myData) <- c("USAID Beneficiary VDCs", "Rest of the VDCs")
+```
+
+Let us have a look at the final dataset that we will be performing the chi-square test on:
+```{r}
+
+knitr::kable(myData, format = "html")
+```
+In the above table, the numbers represent the total number of households that responded according to each combination. Moving ahead with the chi-square test, we have:
+```{r}
+chisq <- chisq.test(myData)
+chisq
+```
+In our example, the row and the column variables are statistically significantly associated (p-value < 0.05). Therefore, the null hypothesis is rejected.
+
+
+#### Correlation Plot for residuals
+In order to know the most contributing cells to the total Chi-square score, we calculate the Pearson residuals for each cell
+```{r}
+corrplot(chisq$residuals, is.cor = FALSE)
+```
+
+For a given cell, the size of the circle is proportional to the amount of the cell contribution.
+
+The sign of the standardized residuals is also very important to interpret the association between rows and columns as explained below:
+
+1. Positive residuals are in blue. Positive values in cells specify an attraction (positive association) between the corresponding row and column variables. There is a strong positive association between the column "wnf_comp_ltm", i.e. Lack of trained masons and the row "USAID Benefeciary VDcs"
+  
+2. Negative residuals are in red. This implies a repulsion (negative association) between the corresponding row and column variables. As we can see, there is negative association between the response "Don't Know" and "USAID Benefeciary VDcs"
+
+#### Correlation Plot for contributions
+We can also calculate contribution (in %) of a given cell to the total Chi-square score and visualize the same. The relative contribution of each cell to the total Chi-square score give some indication of the nature of the dependency between rows and columns of the contingency table.
+```{r}
+contrib <- 100*chisq$residuals^2/chisq$statistic
+round(contrib, 3)
+corrplot(contrib, is.cor = FALSE)
+```
+
+
+### Sample Analysis 2: Construction Status
+We will be starting the analysis with the responses for the "Construction Status" variable. Benefeciearies can provide the following three responses to the question:
+
+* Construction completed (constr_completed)
+* Construction in progress (constr_in_progress)
+* Construction not started (constr_not_started)
+
+These responses will be compared across the following two categories: 
+
+* USAID Benefeciary VDCs
+* Rest of the VDCs in Dhading
+
+
+```{r}
+df_soc <- df[,c("constr_completed", "constr_in_progress", "constr_not_started", "category")]
+df_soc_long <- gather(df_soc, constr_status, value, constr_completed:constr_not_started, factor_key=TRUE)
+df_soc_long$value <- as.numeric(as.character(df_soc_long$value))
+aggdata<- df_soc_long %>% group_by(category, constr_status) %>% summarise(total = sum(value))
+aggData_wide <- spread(aggdata, constr_status, total)
+
+myData <- as.matrix(aggData_wide[,-1])
+rownames(myData) <- c("USAID Beneficiary VDCs", "Rest of the VDCs")
+
+```
+Let us have a look at the final dataset that we will be performing the chi-square test on:
+```{r}
+
+knitr::kable(myData, format = "html")
+```
+In the above table, the numbers represent the total number of households that responded according to each combination. Moving ahead with the chi-square test, we have:
+```{r}
+chisq <- chisq.test(myData)
+chisq
+```
+
+In our example, the row and the column variables are statistically significantly associated (p-value < 0.05). Therefore, the null hypothesis that responses to the above questions are independent of whether the benefeciary comes from a USAID or Non-USAID VDC is rejected.
+
+#### Correlation Plot for residuals
+In order to know the most contributing cells to the total Chi-square score, we calculate the Pearson residuals for each cell
+```{r}
+corrplot(chisq$residuals, is.cor = FALSE)
+```
+
+For a given cell, the size of the circle is proportional to the amount of the cell contribution.
+
+The sign of the standardized residuals is also very important to interpret the association between rows and columns as explained below:
+
+1. Positive residuals are in blue. Positive values in cells specify an attraction (positive association) between the corresponding row and column variables.
+2. Negative residuals are in red. This implies a repulsion (negative association) between the corresponding row and column variables.
+
+
+#### Correlation Plot for contributions
+We can also calculate contribution (in %) of a given cell to the total Chi-square score and visualize the same. The relative contribution of each cell to the total Chi-square score give some indication of the nature of the dependency between rows and columns of the contingency table.
+```{r}
+contrib <- 100*chisq$residuals^2/chisq$statistic
+round(contrib, 3)
+corrplot(contrib, is.cor = FALSE)
+```
+
+
