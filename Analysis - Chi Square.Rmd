@@ -4,7 +4,7 @@ author: "Arogya Koirala"
 date: "April 28, 2017"
 output:
   prettydoc::html_pretty:
-    theme: architect
+    theme: leonids
     highlight: github
 ---
 
