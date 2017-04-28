@@ -1,5 +1,5 @@
 ---
-title: "USAID - Chi Square analysis of Survey respoinses"
+title: "USAID - Chi Square analysis of Survey Responses"
 author: "Arogya Koirala"
 date: "April 28, 2017"
 output:
@@ -35,7 +35,7 @@ Chi-square test examines whether rows and columns of a contingency table are sta
 * Null hypothesis (H0): the row and the column variables of the contingency table are independent.
 * Alternative hypothesis (H1): row and column variables are dependent
 
-This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with df=(r−1)(c−1) degrees of freedom and p = 0.05.
+This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with df=(r-1).(c-1) degrees of freedom and p = 0.05.
 
 If the calculated Chi-square statistic is greater than the critical value, then we must conclude that the row and the column variables are not independent of each other. This implies that they are significantly associated.
 
@@ -43,7 +43,7 @@ If the calculated Chi-square statistic is greater than the critical value, then 
 
 ### 'Construction Completed' Households
 
-Let's perform the analysis on the question "Why weren't the building codes followed" for the households that have already completed construction. Beneficiaries can provide the following responses to the question:
+Let's perform the analysis on the question "Why weren't the building codes followed?" for the households that have already completed construction. Beneficiaries can provide the following responses to the question:
 
 * Don't know (wnf_comp_dk)
 * Too expensive (wnf_comp_te)
@@ -56,7 +56,7 @@ These responses will be compared for the following two categories of VDCs:
 * USAID Benefeciary VDCs
 * Rest of the VDCs in Dhading
 
-First we start by cleaning the raw data, which contains total responses across each bucket.
+First, we start by cleaning the raw data, which contains total responses across each bucket.
 
 ```{r}
 df <- read.csv("data/input_table.csv")
@@ -71,7 +71,7 @@ myData <- as.matrix(aggData_wide[,-1])
 rownames(myData) <- c("USAID Beneficiary VDCs", "Rest of the VDCs")
 ```
 
-Let us have a look at the final dataset that we will be performing the chi-square test on:
+Now that the dataset is all cleaned up, let us have a look at the final dataset that we will be performing the chi-square test on:
 ```{r}
 
 knitr::kable(myData, format = "html")

@@ -14,7 +14,7 @@
 
 <meta name="date" content="2017-04-28" />
 
-<title>USAID - Chi Square analysis of Survey respoinses</title>
+<title>USAID - Chi Square analysis of Survey Responses</title>
 
 
 
@@ -72,7 +72,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <div class="col s12 m3">
 <div class="table cover">
 <div class="cover-card table-cell table-middle">
-<span class="author_name">USAID - Chi Square analysis of Survey respoinses</span>
+<span class="author_name">USAID - Chi Square analysis of Survey Responses</span>
 <span class="author_bio mbm">Arogya Koirala</span>
 <span class="author_bio mbm">April 28, 2017</span>
 </div>
@@ -101,7 +101,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>Null hypothesis (H0): the row and the column variables of the contingency table are independent.</li>
 <li>Alternative hypothesis (H1): row and column variables are dependent</li>
 </ul>
-<p>This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with df=(râ1)(câ1) degrees of freedom and p = 0.05.</p>
+<p>This calculated Chi-square statistic is compared to the critical value (obtained from statistical tables) with df=(r-1).(c-1) degrees of freedom and p = 0.05.</p>
 <p>If the calculated Chi-square statistic is greater than the critical value, then we must conclude that the row and the column variables are not independent of each other. This implies that they are significantly associated.</p>
 </div>
 </div>
@@ -109,7 +109,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <h2>Sample Analysis 1 : Why weren’t the building codes followed?</h2>
 <div id="construction-completed-households" class="section level3">
 <h3>‘Construction Completed’ Households</h3>
-<p>Let’s perform the analysis on the question “Why weren’t the building codes followed” for the households that have already completed construction. Beneficiaries can provide the following responses to the question:</p>
+<p>Let’s perform the analysis on the question “Why weren’t the building codes followed?” for the households that have already completed construction. Beneficiaries can provide the following responses to the question:</p>
 <ul>
 <li>Don’t know (wnf_comp_dk)</li>
 <li>Too expensive (wnf_comp_te)</li>
@@ -122,7 +122,7 @@ code > span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Inf
 <li>USAID Benefeciary VDCs</li>
 <li>Rest of the VDCs in Dhading</li>
 </ul>
-<p>First we start by cleaning the raw data, which contains total responses across each bucket.</p>
+<p>First, we start by cleaning the raw data, which contains total responses across each bucket.</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">df &lt;-<span class="st"> </span><span class="kw">read.csv</span>(<span class="st">&quot;data/input_table.csv&quot;</span>)
 df &lt;-<span class="st"> </span>df [-(<span class="kw">which</span>(df$surveyed_popn ==<span class="st"> </span><span class="dv">0</span>)),]
 df_soc &lt;-<span class="st"> </span>df[,<span class="kw">c</span>(<span class="st">&quot;wnf_comp_dk&quot;</span>,<span class="st">&quot;wnf_comp_te&quot;</span>,<span class="st">&quot;wnf_comp_ltm&quot;</span>,<span class="st">&quot;wnf_comp_dc&quot;</span>,<span class="st">&quot;wnf_comp_other&quot;</span>, <span class="st">&quot;category&quot;</span>)]
@@ -133,7 +133,7 @@ aggData_wide &lt;-<span class="st"> </span><span class="kw">spread</span>(aggdat
 
 myData &lt;-<span class="st"> </span><span class="kw">as.matrix</span>(aggData_wide[,-<span class="dv">1</span>])
 <span class="kw">rownames</span>(myData) &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;USAID Beneficiary VDCs&quot;</span>, <span class="st">&quot;Rest of the VDCs&quot;</span>)</code></pre></div>
-<p>Let us have a look at the final dataset that we will be performing the chi-square test on:</p>
+<p>Now that the dataset is all cleaned up, let us have a look at the final dataset that we will be performing the chi-square test on:</p>
 <div class="sourceCode"><pre class="sourceCode r"><code class="sourceCode r">knitr::<span class="kw">kable</span>(myData, <span class="dt">format =</span> <span class="st">&quot;html&quot;</span>)</code></pre></div>
 <table>
 <thead>
